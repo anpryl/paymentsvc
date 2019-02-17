@@ -9,9 +9,20 @@
   revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
   version = "v1.2.0"
 
+[[projects]]
+  digest = "1:1b8282c02f3cbf27de019d739246eaf8231f5dbcaaf9d0d7c7524184ee7b2d24"
+  name = "github.com/vrischmann/envconfig"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7a443243d539c9595dd8aa7f03a6f68707b80e66"
+  version = "v1.1.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/satori/go.uuid"]
+  input-imports = [
+    "github.com/satori/go.uuid",
+    "github.com/vrischmann/envconfig",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
