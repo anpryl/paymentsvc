@@ -62,6 +62,8 @@ func (a *accountsRepository) ListOfAccounts(
 ) ([]models.Account, error) {
 	var accs []models.Account
 	err := a.db.WithContext(ctx).Model(&accs).
+		Offset(ol.Offset).
+		Limit(ol.Limit).
 		Order("id ASC").
 		Select()
 	return accs, err
