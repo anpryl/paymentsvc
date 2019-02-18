@@ -11,7 +11,6 @@ import (
 	"github.com/anpryl/paymentsvc/svcerrors"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-
 	uuid "github.com/satori/go.uuid"
 )
 

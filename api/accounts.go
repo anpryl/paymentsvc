@@ -32,10 +32,7 @@ func addAccountEndpoint(svc services.AccountService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(services.NewAccount)
 		id, err := svc.AddAccount(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-		return IDResp{ID: id}, nil
+		return IDResp{ID: id}, err
 	}
 }
 
@@ -49,6 +46,6 @@ func decodeAddAccountReq(_ context.Context, r *http.Request) (interface{}, error
 func accountsEndpoint(svc services.AccountService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(models.OffsetLimit)
-		return svc.ListOfAccounts(ctx, req.Offset, req.Limit)
+		return svc.ListOfAccounts(ctx, req)
 	}
 }
