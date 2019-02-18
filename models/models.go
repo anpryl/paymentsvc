@@ -1,21 +1,22 @@
 package models
 
-import uuid "github.com/satori/go.uuid"
+import (
+	uuid "github.com/satori/go.uuid"
+	"github.com/shopspring/decimal"
+)
 
 // Currency - basic info about currency
 type Currency struct {
-	AlphaCode   string
 	NumericCode int
+	AlphaCode   string
 	Minor       uint // Number of decimal units
 }
 
 // Account - information about account
 type Account struct {
-	ID                   uuid.UUID `json:"id"`
-	CurrencyNumbericCode int       `json:"currency_numberic_code"`
-
-	// Balance is stored in minimal units. For example for USD it would be in cents.
-	Balance uint64 `json:"balance"`
+	ID                  uuid.UUID       `sql:"id,pk,type:uuid default uuid_generate_v4()" json:"id"`
+	CurrencyNumericCode int             `json:"currency_numeric_code"`
+	Balance             decimal.Decimal `json:"balance"`
 }
 
 const (
