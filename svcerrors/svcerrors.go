@@ -14,7 +14,11 @@ func (e *Error) Error() string {
 
 // Business error codes
 const (
-	InvalidCurrencyCode = 1
+	InvalidCurrencyCode       = 1
+	InvalidAccountIDCode      = 2
+	NegativeBalanceCode       = 3
+	NegativePaymentAmountCode = 4
+	NotEnouthMoneyCode        = 5
 )
 
 // Business errors
@@ -22,6 +26,22 @@ var (
 	ErrInvalidCurrencyCode = &Error{
 		Code: InvalidCurrencyCode,
 		Msg:  "INVALID_CURRENCY_CODE",
+	}
+	ErrInvalidAccountID = &Error{
+		Code: InvalidAccountIDCode,
+		Msg:  "INVALID_ACCOUNT_ID",
+	}
+	ErrNegativeBalance = &Error{
+		Code: NegativeBalanceCode,
+		Msg:  "NEGATIVE_BALANCE",
+	}
+	ErrNegativePaymentAmount = &Error{
+		Code: NegativePaymentAmountCode,
+		Msg:  "NEGATIVE_PAYMENT_AMOUNT",
+	}
+	ErrNotEnouthMoney = &Error{
+		Code: NotEnouthMoneyCode,
+		Msg:  "NOT_ENOUGH_MONEY",
 	}
 )
 
