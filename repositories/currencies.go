@@ -8,15 +8,15 @@ import (
 	"github.com/go-pg/pg"
 )
 
-func NewCurrencyRepository(db *pg.DB) Currency {
-	return &currencyRepository{db: db}
+func NewCurrenciesRepository(db *pg.DB) Currencies {
+	return &currenciesRepository{db: db}
 }
 
-type currencyRepository struct {
+type currenciesRepository struct {
 	db *pg.DB
 }
 
-func (c *currencyRepository) AllCurrencies(ctx context.Context) ([]models.Currency, error) {
+func (c *currenciesRepository) AllCurrencies(ctx context.Context) ([]models.Currency, error) {
 	var cs []models.Currency
 	err := c.db.WithContext(ctx).Model(&cs).
 		Order("numeric_code ASC").
@@ -24,7 +24,7 @@ func (c *currencyRepository) AllCurrencies(ctx context.Context) ([]models.Curren
 	return cs, err
 }
 
-func (c *currencyRepository) CurrencyByNumericCode(ctx context.Context, numericCode int) (*models.Currency, error) {
+func (c *currenciesRepository) CurrencyByNumericCode(ctx context.Context, numericCode int) (*models.Currency, error) {
 	cur := &models.Currency{
 		NumericCode: numericCode,
 	}
