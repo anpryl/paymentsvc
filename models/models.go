@@ -1,9 +1,18 @@
 package models
 
 import (
+	"time"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/shopspring/decimal"
 )
+
+// Account - information about account
+type Account struct {
+	ID                  uuid.UUID       `sql:"id,pk,type:uuid default uuid_generate_v4()" json:"id"`
+	CurrencyNumericCode int             `json:"currency_numeric_code"`
+	Balance             decimal.Decimal `json:"balance"`
+}
 
 // Currency - basic info about currency
 type Currency struct {
@@ -12,11 +21,21 @@ type Currency struct {
 	Minor       int32  `json:"minor"` // Number of decimal units
 }
 
-// Account - information about account
-type Account struct {
-	ID                  uuid.UUID       `sql:"id,pk,type:uuid default uuid_generate_v4()" json:"id"`
+// ExchangeRate - information about exchange rates between two currencies
+type ExchangeRate struct {
+	ID                      uuid.UUID       `sql:"numeric_code,pk" json:"id"`
+	CurrencyNumericCodeFrom int             `json:"currency_numeric_code_from"`
+	CurrencyNumericCodeTo   int             `json:"currency_numeric_code_to"`
+	Rate                    decimal.Decimal `json:"rate"`
+}
+
+type Payment struct {
+	ID                  uuid.UUID       `sql:"id,pk" json:"id"`
+	FromAccount         uuid.UUID       `json:"from_account"`
+	ToAccount           uuid.UUID       `json:"to_account"`
 	CurrencyNumericCode int             `json:"currency_numeric_code"`
-	Balance             decimal.Decimal `json:"balance"`
+	Amount              decimal.Decimal `json:"amount"`
+	CreatedAt           time.Time       `json:"created_at"`
 }
 
 const (
@@ -28,4 +47,9 @@ const (
 type OffsetLimit struct {
 	Offset int
 	Limit  int
+}
+
+type ExchangeRateArgs struct {
+	CurrencyNumericCodeFrom int
+	CurrencyNumericCodeTo   int
 }
