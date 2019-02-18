@@ -6,54 +6,57 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/anpryl/paymentsvc/models"
 	"github.com/anpryl/paymentsvc/services"
 	"github.com/anpryl/paymentsvc/svcerrors"
 	"github.com/go-chi/chi"
-	"github.com/go-kit/kit/endpoint"
+	"github.com/go-chi/chi/middleware"
 
-	httptransport "github.com/go-kit/kit/transport/http"
+	uuid "github.com/satori/go.uuid"
 )
 
 func New(as services.AccountService) http.Handler {
 	r := chi.NewRouter()
-	listAccountsHandler := httptransport.NewServer(
-		accounts(as),
-		decodeListAccountsReq,
-		encodeResponse,
-	)
-	r.Method(http.MethodPost, "/accounts", listAccountsHandler)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	accountsEndpoints(r, as)
 	return r
 }
 
-func decodeListAccountsReq(_ context.Context, r *http.Request) (interface{}, error) {
-	strLimit := r.URL.Query().Get("limit")
-	limit, err := strconv.Atoi(strLimit)
-	if err != nil {
-		return nil, svcerrors.ErrInvalidLimitValue
-	}
-	strOffset := r.URL.Query().Get("offset")
-	offset, err := strconv.Atoi(strOffset)
-	if err != nil {
-		return nil, svcerrors.ErrInvalidOffsetValue
-	}
-	return ListAccountsReq{
-		Limit:  limit,
-		Offset: offset,
-	}, nil
+type IDResp struct {
+	ID uuid.UUID `json:"id"`
 }
 
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+func decodeOffsetLimitReq(_ context.Context, r *http.Request) (interface{}, error) {
+	var err error
+	var req models.OffsetLimit
+	strLimit := r.URL.Query().Get("limit")
+	if strLimit == "" {
+		req.Limit = models.DefaultLimit
+	} else {
+		req.Limit, err = strconv.Atoi(strLimit)
+		if err != nil {
+			return nil, svcerrors.ErrInvalidLimitValue
+		}
+	}
+	strOffset := r.URL.Query().Get("offset")
+	if strOffset == "" {
+		req.Offset = models.DefaultOffset
+	} else {
+		req.Offset, err = strconv.Atoi(strOffset)
+		if err != nil {
+			return nil, svcerrors.ErrInvalidOffsetValue
+		}
+	}
+	return req, nil
+}
+
+func encodeResponseOK(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.WriteHeader(http.StatusOK)
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListAccountsReq struct {
-	Limit  int
-	Offset int
-}
-
-func accounts(svc services.AccountService) endpoint.Endpoint {
-	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(ListAccountsReq)
-		return svc.ListOfAccounts(req.Offset, req.Limit)
-	}
+func encodeResponseCreated(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	w.WriteHeader(http.StatusCreated)
+	return json.NewEncoder(w).Encode(response)
 }
