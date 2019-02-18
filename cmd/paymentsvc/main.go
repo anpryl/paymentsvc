@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	_ "github.com/anpryl/paymentsvc/migrations"
+	"github.com/anpryl/paymentsvc/repositories"
 
 	"github.com/anpryl/paymentsvc/api"
 	"github.com/anpryl/paymentsvc/config"
@@ -19,7 +20,8 @@ func main() {
 	cfg := config.FromEnv()
 	db := connectDB(cfg)
 	tryMigrate(db)
-	as := services.NewAccountService()
+	ar := repositories.NewAccountRepository(db)
+	as := services.NewAccountService(ar)
 	r := api.New(as)
 	log.Println("Starting server")
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Http.Host, cfg.Http.Port), r)
@@ -39,12 +41,12 @@ func connectDB(cfg config.Config) *pg.DB {
 func tryMigrate(db *pg.DB) {
 	_, err := db.Exec(`
       	CREATE TABLE IF NOT EXISTS gopg_migrations (
-      	      id serial,
-      	      version bigint,
-      	      created_at timestamptz
+      	       id serial,
+      	       version bigint,
+      	       created_at timestamptz
 	)`)
 	if err != nil {
-		log.Fatalf("Failed to create gopg_migrations table")
+		log.Fatalf("Failed to create gopg_migrations table: %v", err)
 	}
 	oldVersion, newVersion, err := migrations.Run(db, flag.Args()...)
 	if err != nil {
