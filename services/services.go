@@ -19,6 +19,7 @@ type Currencies interface {
 
 type Payments interface {
 	CreatePayment(context.Context, NewPayment) (uuid.UUID, error)
+	AccountPayments(context.Context, uuid.UUID, models.OffsetLimit) ([]models.Payment, error)
 }
 
 type NewPayment struct {

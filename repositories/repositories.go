@@ -27,6 +27,7 @@ type ExchangeRates interface {
 }
 
 type Payments interface {
+	AccountPayments(context.Context, uuid.UUID, models.OffsetLimit) ([]models.Payment, error)
 	CreatePayment(context.Context, Tx, models.Payment) (uuid.UUID, error)
 }
 

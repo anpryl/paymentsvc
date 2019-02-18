@@ -31,6 +31,10 @@ type paymentsService struct {
 	withTx                  repositories.WithTransactionFunc
 }
 
+func (p *paymentsService) AccountPayments(ctx context.Context, id uuid.UUID, ol models.OffsetLimit) ([]models.Payment, error) {
+	return p.paymentsRepository.AccountPayments(ctx, id, ol)
+}
+
 func (ps *paymentsService) CreatePayment(
 	ctx context.Context,
 	p NewPayment,
