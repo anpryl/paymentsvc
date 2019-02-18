@@ -13,10 +13,17 @@ func (e *Error) Error() string {
 }
 
 // Business error codes
-const ()
+const (
+	InvalidCurrencyCode = 1
+)
 
 // Business errors
-var ()
+var (
+	ErrInvalidCurrencyCode = &Error{
+		Code: InvalidCurrencyCode,
+		Msg:  "INVALID_CURRENCY_CODE",
+	}
+)
 
 // Validation error codes
 const (
