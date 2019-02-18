@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_USER:     'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB:       'paymentsvc'
+    networks:
+      - payment-db
+
+  paymentsvc:
+    build: .
+    restart: always
+    environment:
+      POSTGRESQL_HOST:     'db'
+      POSTGRESQL_PORT:     5432
+      POSTGRESQL_USER:     'postgres'
+      POSTGRESQL_PASSWORD: 'postgres'
+      POSTGRESQL_DATABASE: 'paymentsvc'
+    networks:
+      - payment-db
+      - testing
+    depends_on:
+      - db
+  test:
+    environment:
+      TEST_SERVER_ADDR: 'http://paymentsvc'
+    command: ['./wait-for-it/wait-for-it.sh', 'paymentsvc:80', '--' , 'go', 'test', './integration_tests']
+    networks:
+      - testing
+    depends_on:
+      - paymentsvc
+    build: 
+      context: .
+      dockerfile: integration_tests/Dockerfile
+
+networks:
+  payment-db:
+  testing:
