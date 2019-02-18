@@ -7,9 +7,9 @@ import (
 
 // Currency - basic info about currency
 type Currency struct {
-	NumericCode int
-	AlphaCode   string
-	Minor       uint // Number of decimal units
+	NumericCode int    `sql:"numeric_code,pk" json:"numeric_code"`
+	AlphaCode   string `json:"alpha_code"`
+	Minor       int32  `json:"minor"` // Number of decimal units
 }
 
 // Account - information about account
