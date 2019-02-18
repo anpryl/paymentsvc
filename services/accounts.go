@@ -8,14 +8,19 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func NewAccountService(ar repositories.AccountRepository) AccountService {
+func NewAccountService(
+	ar repositories.Account,
+	cr repositories.Currency,
+) Account {
 	return &accountService{
-		accountRepository: ar,
+		accountRepository:  ar,
+		currencyRepository: cr,
 	}
 }
 
 type accountService struct {
-	accountRepository repositories.AccountRepository
+	accountRepository  repositories.Account
+	currencyRepository repositories.Currency
 }
 
 func (as *accountService) ListOfAccounts(
@@ -29,8 +34,12 @@ func (as *accountService) AddAccount(
 	ctx context.Context,
 	newAcc NewAccount,
 ) (uuid.UUID, error) {
+	currency, err := as.currencyRepository.CurrencyByNumericCode(ctx, newAcc.CurrencyNumericCode)
+	if err != nil {
+		return uuid.Nil, err
+	}
 	return as.accountRepository.CreateAccount(ctx, models.Account{
-		CurrencyNumericCode: newAcc.CurrencyNumbericCode,
-		Balance:             newAcc.Balance,
+		CurrencyNumericCode: newAcc.CurrencyNumericCode,
+		Balance:             newAcc.Balance.RoundBank(currency.Minor),
 	})
 }
