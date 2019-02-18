@@ -7,14 +7,14 @@ import (
 	"github.com/anpryl/paymentsvc/repositories"
 )
 
-func NewCurrencyService(cr repositories.Currency) Currency {
-	return &currencyService{currencyRepository: cr}
+func NewCurrenciesService(cr repositories.Currencies) Currencies {
+	return &currencyService{currenciesRepository: cr}
 }
 
 type currencyService struct {
-	currencyRepository repositories.Currency
+	currenciesRepository repositories.Currencies
 }
 
 func (c *currencyService) AllCurrencies(ctx context.Context) ([]models.Currency, error) {
-	return c.currencyRepository.AllCurrencies(ctx)
+	return c.currenciesRepository.AllCurrencies(ctx)
 }
