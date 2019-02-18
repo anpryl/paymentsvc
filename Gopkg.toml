@@ -52,3 +52,7 @@
 [[constraint]]
   name = "github.com/go-pg/pg"
   version = "7.1.7"
+
+[[constraint]]
+  name = "github.com/shopspring/decimal"
+  version = "1.1.0"
