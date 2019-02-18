@@ -8,7 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func NewAccountRepository(db *pg.DB) AccountRepository {
+func NewAccountRepository(db *pg.DB) Account {
 	return &accountRepository{db: db}
 }
 
