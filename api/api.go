@@ -14,11 +14,15 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func New(as services.AccountService) http.Handler {
+func New(
+	as services.Account,
+	cs services.Currency,
+) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	accountsEndpoints(r, as)
+	currenciesEndpoints(r, cs)
 	return r
 }
 

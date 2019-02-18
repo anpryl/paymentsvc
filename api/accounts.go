@@ -13,7 +13,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
-func accountsEndpoints(r *chi.Mux, as services.AccountService) {
+func accountsEndpoints(r *chi.Mux, as services.Account) {
 	listAccountsHandler := httptransport.NewServer(
 		accountsEndpoint(as),
 		decodeOffsetLimitReq,
@@ -28,7 +28,7 @@ func accountsEndpoints(r *chi.Mux, as services.AccountService) {
 	r.Method(http.MethodPost, "/accounts", addAccountHandler)
 }
 
-func addAccountEndpoint(svc services.AccountService) endpoint.Endpoint {
+func addAccountEndpoint(svc services.Account) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(services.NewAccount)
 		id, err := svc.AddAccount(ctx, req)
@@ -43,7 +43,7 @@ func decodeAddAccountReq(_ context.Context, r *http.Request) (interface{}, error
 	return acc, err
 }
 
-func accountsEndpoint(svc services.AccountService) endpoint.Endpoint {
+func accountsEndpoint(svc services.Account) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(models.OffsetLimit)
 		return svc.ListOfAccounts(ctx, req)
