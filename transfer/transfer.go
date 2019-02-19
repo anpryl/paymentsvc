@@ -1,8 +1,10 @@
+// Package transfer implements required logic to transfer money between accounts
 package transfer
 
 import (
 	"github.com/anpryl/paymentsvc/models"
 	"github.com/anpryl/paymentsvc/svcerrors"
+	uuid "github.com/satori/go.uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -16,7 +18,7 @@ type Transfer struct {
 type AccountInfo struct {
 	Account      models.Account
 	Currency     models.Currency
-	ExchangeRate decimal.Decimal // ExchangeRate to convert Transfer Amount into Account Currency
+	ExchangeRate decimal.Decimal // ExchangeRate from Transfer Currency into Account Currency
 }
 
 type Result struct {
@@ -25,7 +27,16 @@ type Result struct {
 	TransferAmount decimal.Decimal
 }
 
+// BetweenAccounts - transfers money between accounts.
+// Supports transfering in/between different currencies.
+// It return error in next cases:
+// - Transfering between same account
+// - Negative transfer amount
+// - From Account doesn't have enough money
 func BetweenAccounts(t Transfer) (*Result, error) {
+	if uuid.Equal(t.From.Account.ID, t.To.Account.ID) {
+		return nil, svcerrors.ErrSameAccountTransfer
+	}
 	if t.Amount.LessThanOrEqual(decimal.Zero) {
 		return nil, svcerrors.ErrNegativePaymentAmount
 	}
@@ -42,12 +53,11 @@ func BetweenAccounts(t Transfer) (*Result, error) {
 	fromAcc.Balance = fromAcc.Balance.Sub(fromAccAmount).RoundBank(t.From.Currency.Minor)
 	toAcc := t.To.Account
 	toAcc.Balance = toAcc.Balance.Add(toAccAmount).RoundBank(t.To.Currency.Minor)
-	res := &Result{
+	return &Result{
 		From:           fromAcc,
 		To:             toAcc,
 		TransferAmount: t.Amount,
-	}
-	return res, nil
+	}, nil
 }
 
 func accountAmount(t Transfer, acc AccountInfo) decimal.Decimal {

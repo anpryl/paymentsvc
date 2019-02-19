@@ -49,11 +49,14 @@ func TestNegativeTransfer(t *testing.T) {
 		},
 		ExchangeRate: decimal.NewFromFloat(18.5),
 	}
+
 	acc3 := acc1
 	acc3.Account.ID = uuid.NewV4()
 
 	negativeTransfer := test{
 		args: transfer.Transfer{
+			From:   acc1,
+			To:     acc2,
 			Amount: decimal.NewFromFloat(-1),
 		},
 		err: svcerrors.ErrNegativePaymentAmount,
@@ -104,12 +107,41 @@ func TestNegativeTransfer(t *testing.T) {
 		err: svcerrors.ErrNotEnouthMoney,
 	}
 
+	sameAccountID := test{
+		args: transfer.Transfer{
+			From:     acc1,
+			To:       acc1,
+			Amount:   decimal.NewFromFloat(1),
+			Currency: acc1.Currency,
+		},
+		err: svcerrors.ErrSameAccountTransfer,
+	}
+
+	threeCurrenciesTransfer := test{
+		args: transfer.Transfer{
+			From:   acc1,
+			To:     acc2,
+			Amount: decimal.NewFromFloat(10),
+			Currency: models.Currency{
+				NumericCode: 3,
+				Minor:       20,
+			},
+		},
+		res: &transfer.Result{
+			From:           modifyBalance(acc1, 245),
+			To:             modifyBalance(acc2, 385),
+			TransferAmount: decimal.NewFromFloat(10),
+		},
+	}
+
 	tests := []test{
 		negativeTransfer,
 		acc1SameCurrencyTransfer,
 		sameCurrencyTransfer,
 		tooBigTransfer,
 		sameCurrencyTransferTooBig,
+		sameAccountID,
+		threeCurrenciesTransfer,
 	}
 	for i, test := range tests {
 		res, err := transfer.BetweenAccounts(test.args)
