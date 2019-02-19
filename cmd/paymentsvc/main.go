@@ -19,25 +19,28 @@ import (
 func main() {
 	cfg := config.FromEnv()
 	db := connectDB(cfg)
+	txFunc := repositories.NewWithTransactionFunc(db)
 	tryMigrate(db)
-	ar := repositories.NewAccountRepository(db)
-	cr := repositories.NewCurrencyRepository(db)
-	as := services.NewAccountService(ar, cr)
-	cs := services.NewCurrencyService(cr)
-	r := api.New(as, cs)
+	ar := repositories.NewAccountsRepository(db)
+	er := repositories.NewExchangeRatesRepository(db)
+	cr := repositories.NewCurrenciesRepository(db)
+	pr := repositories.NewPaymentsRepository(db)
+	as := services.NewAccountsService(ar, cr)
+	cs := services.NewCurrenciesService(cr)
+	ps := services.NewPaymentsService(pr, ar, cr, er, txFunc)
+	r := api.New(as, cs, ps)
 	log.Println("Starting server")
 	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Http.Host, cfg.Http.Port), r)
 	log.Fatal(err)
 }
 
 func connectDB(cfg config.Config) *pg.DB {
-	db := pg.Connect(&pg.Options{
+	return pg.Connect(&pg.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.PostgreSQL.Host, cfg.PostgreSQL.Port),
 		User:     cfg.PostgreSQL.User,
 		Password: cfg.PostgreSQL.Password,
 		Database: cfg.PostgreSQL.Database,
 	})
-	return db
 }
 
 func tryMigrate(db *pg.DB) {
