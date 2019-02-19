@@ -56,6 +56,7 @@ To run integration tests, which are located in `integration_tests` folder, run `
 I was very limited in time. So I had to sacrifice some features, good practices, etc.
 
  * Add sctructured logging with <https://github.com/sirupsen/logrus>
+ * API error rendering, might be better, need to dig dipper in go-kit
  * Store in payment history how much money was withdrawed/credited in account's currency.
  * Integration with some online exchange service to update exchange rates on the flight. For example via <https://github.com/me-io/go-swap>
  * Extend current exchange rates database. It is only USD to UAH,BYN,RYB,EUR. And, for example, when UAH converted to BYN it uses USD to BYN and USD to UAH rates to calculate UAH to BYN rate.
