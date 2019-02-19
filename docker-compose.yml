@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_USER:     'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB:       'paymentsvc'
+    networks:
+      - payment-db
+
+  paymentsvc:
+    build: .
+    restart: always
+    ports:
+      - 9090:80
+    environment:
+      POSTGRESQL_HOST:     'db'
+      POSTGRESQL_PORT:     5432
+      POSTGRESQL_USER:     'postgres'
+      POSTGRESQL_PASSWORD: 'postgres'
+      POSTGRESQL_DATABASE: 'paymentsvc'
+    networks:
+      - payment-db
+    depends_on:
+      - db
+
+networks:
+  payment-db:
