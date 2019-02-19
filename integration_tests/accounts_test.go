@@ -7,6 +7,7 @@ import (
 	"github.com/anpryl/paymentsvc/api"
 	"github.com/anpryl/paymentsvc/models"
 	"github.com/anpryl/paymentsvc/services"
+	"github.com/anpryl/paymentsvc/svcerrors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -41,15 +42,23 @@ func TestAddAccountInvalidCurrency(t *testing.T) {
 		CurrencyNumericCode: -1000000,
 		Balance:             decimal.NewFromFloat(10000.5012),
 	}
-	var idResp api.IDResp
+	var idResp struct {
+		api.IDResp
+		svcerrors.Error
+	}
 	_, err := httpPostJSON("/accounts", acc, &idResp)
-	a.NotNil(err)
-	a.Zero(idResp)
+	a.Nil(err)
+	a.NotZero(idResp.Error)
+	a.Zero(idResp.IDResp)
 
-	var res models.Account
+	var res struct {
+		models.Account
+		svcerrors.Error
+	}
 	_, err = httpGetJSON("/accounts/"+idResp.ID.String(), &res)
-	a.NotNil(err)
-	a.Zero(res)
+	a.Nil(err)
+	a.NotZero(res.Error)
+	a.Zero(res.Account)
 }
 
 func TestNegativeBalance(t *testing.T) {
@@ -58,13 +67,21 @@ func TestNegativeBalance(t *testing.T) {
 		CurrencyNumericCode: 980, // UAH
 		Balance:             decimal.NewFromFloat(-10000),
 	}
-	var idResp api.IDResp
+	var idResp struct {
+		api.IDResp
+		svcerrors.Error
+	}
 	_, err := httpPostJSON("/accounts", acc, &idResp)
-	a.NotNil(err)
-	a.Zero(idResp)
+	a.Nil(err)
+	a.NotZero(idResp.Error)
+	a.Zero(idResp.IDResp)
 
-	var res models.Account
+	var res struct {
+		models.Account
+		svcerrors.Error
+	}
 	_, err = httpGetJSON("/accounts/"+idResp.ID.String(), &res)
-	a.NotNil(err)
-	a.Zero(res)
+	a.Nil(err)
+	a.NotZero(res.Error)
+	a.Zero(res.Account)
 }
