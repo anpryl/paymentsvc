@@ -45,8 +45,8 @@ func (*accountsRepository) AccountByIDTx(
 	tx Tx,
 	id uuid.UUID,
 ) (*models.Account, error) {
-	acc := &models.Account{ID: id}
-	err := tx.Model(acc).Select()
+	acc := &models.Account{}
+	err := tx.Model(acc).Where("id = ?", id).Select()
 	if err == pg.ErrNoRows {
 		return nil, svcerrors.ErrInvalidAccountID
 	}
