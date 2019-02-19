@@ -15,14 +15,16 @@ import (
 )
 
 func New(
-	as services.Account,
-	cs services.Currency,
+	as services.Accounts,
+	cs services.Currencies,
+	ps services.Payments,
 ) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	accountsEndpoints(r, as)
 	currenciesEndpoints(r, cs)
+	paymentEndpoints(r, ps)
 	return r
 }
 
@@ -31,6 +33,10 @@ type IDResp struct {
 }
 
 func decodeOffsetLimitReq(_ context.Context, r *http.Request) (interface{}, error) {
+	return decodeOffsetLimitRequest(r)
+}
+
+func decodeOffsetLimitRequest(r *http.Request) (models.OffsetLimit, error) {
 	var err error
 	var req models.OffsetLimit
 	strLimit := r.URL.Query().Get("limit")
@@ -39,7 +45,7 @@ func decodeOffsetLimitReq(_ context.Context, r *http.Request) (interface{}, erro
 	} else {
 		req.Limit, err = strconv.Atoi(strLimit)
 		if err != nil {
-			return nil, svcerrors.ErrInvalidLimitValue
+			return req, svcerrors.ErrInvalidLimitValue
 		}
 	}
 	strOffset := r.URL.Query().Get("offset")
@@ -48,7 +54,7 @@ func decodeOffsetLimitReq(_ context.Context, r *http.Request) (interface{}, erro
 	} else {
 		req.Offset, err = strconv.Atoi(strOffset)
 		if err != nil {
-			return nil, svcerrors.ErrInvalidOffsetValue
+			return req, svcerrors.ErrInvalidOffsetValue
 		}
 	}
 	return req, nil

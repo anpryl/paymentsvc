@@ -11,7 +11,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
-func currenciesEndpoints(r *chi.Mux, cs services.Currency) {
+func currenciesEndpoints(r *chi.Mux, cs services.Currencies) {
 	listAccountsHandler := httptransport.NewServer(
 		allCurrenciesEndpoint(cs),
 		httptransport.NopRequestDecoder,
@@ -20,8 +20,12 @@ func currenciesEndpoints(r *chi.Mux, cs services.Currency) {
 	r.Method(http.MethodGet, "/currencies", listAccountsHandler)
 }
 
-func allCurrenciesEndpoint(svc services.Currency) endpoint.Endpoint {
+func allCurrenciesEndpoint(svc services.Currencies) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		return svc.AllCurrencies(ctx)
+		cs, err := svc.AllCurrencies(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return cs, nil
 	}
 }
