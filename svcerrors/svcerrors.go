@@ -19,6 +19,7 @@ const (
 	NegativeBalanceCode       = 3
 	NegativePaymentAmountCode = 4
 	NotEnouthMoneyCode        = 5
+	SameAccountTransferCode   = 6
 )
 
 // Business errors
@@ -42,6 +43,10 @@ var (
 	ErrNotEnouthMoney = &Error{
 		Code: NotEnouthMoneyCode,
 		Msg:  "NOT_ENOUGH_MONEY",
+	}
+	ErrSameAccountTransfer = &Error{
+		Code: SameAccountTransferCode,
+		Msg:  "SAME_ACCOUNT_TRANSFER",
 	}
 )
 
