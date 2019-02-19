@@ -29,6 +29,8 @@ type Result struct {
 
 // BetweenAccounts - transfers money between accounts.
 // Supports transfering in/between different currencies.
+// Actually transfer can be done in
+// three(From Account Currency, To Account Currency, Transfer Currency) different currencies.
 // It return error in next cases:
 // - Transfering between same account
 // - Negative transfer amount
