@@ -1,5 +1,5 @@
 CREATE TABLE payments (
-       id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+       id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
        from_account uuid NOT NULL,
        to_account uuid NOT NULL,
        currency_numeric_code smallint NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE exchange_rates (
-       id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+       id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
        currency_numeric_code_from smallint NOT NULL,
        currency_numeric_code_to smallint NOT NULL,
        rate numeric NOT NULL,
