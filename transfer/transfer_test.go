@@ -18,11 +18,6 @@ type test struct {
 	err  error
 }
 
-func modifyBalance(acc transfer.AccountInfo, balance float64) models.Account {
-	acc.Account.Balance = decimal.NewFromFloat(balance)
-	return acc.Account
-}
-
 func TestNegativeTransfer(t *testing.T) {
 	a := assert.New(t)
 	acc1 := transfer.AccountInfo{
@@ -170,4 +165,9 @@ func jsonEq(a *assert.Assertions, expected interface{}, actual interface{}, msgs
 	aBytes, err := json.Marshal(actual)
 	a.Nil(err)
 	a.JSONEq(string(eBytes), string(aBytes), msgs...)
+}
+
+func modifyBalance(acc transfer.AccountInfo, balance float64) models.Account {
+	acc.Account.Balance = decimal.NewFromFloat(balance)
+	return acc.Account
 }
