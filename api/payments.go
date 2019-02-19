@@ -32,7 +32,7 @@ func createPaymentEndpoint(svc services.Payments) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(services.NewPayment)
 		id, err := svc.CreatePayment(ctx, req)
-		return IDResp{ID: id}, err
+		return errResp(IDResp{ID: id}, err)
 	}
 }
 
@@ -51,7 +51,8 @@ type AccountPaymentsReq struct {
 func accountPaymentsEndpoint(svc services.Payments) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(AccountPaymentsReq)
-		return svc.AccountPayments(ctx, req.ID, req.OffsetLimit)
+		ps, err := svc.AccountPayments(ctx, req.ID, req.OffsetLimit)
+		return errResp(ps, err)
 	}
 }
 

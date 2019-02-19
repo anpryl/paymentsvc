@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -58,6 +59,17 @@ func decodeOffsetLimitRequest(r *http.Request) (models.OffsetLimit, error) {
 		}
 	}
 	return req, nil
+}
+
+func errResp(res interface{}, err error) (interface{}, error) {
+	if err != nil {
+		if svcErr, ok := err.(*svcerrors.Error); ok {
+			return svcErr, nil
+		}
+		fmt.Println("Internal error:", err)
+		return nil, svcerrors.ErrInternalError
+	}
+	return res, err
 }
 
 func encodeResponseOK(_ context.Context, w http.ResponseWriter, response interface{}) error {

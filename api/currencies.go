@@ -23,9 +23,6 @@ func currenciesEndpoints(r *chi.Mux, cs services.Currencies) {
 func allCurrenciesEndpoint(svc services.Currencies) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		cs, err := svc.AllCurrencies(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return cs, nil
+		return errResp(cs, err)
 	}
 }
