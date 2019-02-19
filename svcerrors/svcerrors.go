@@ -4,8 +4,8 @@ import "fmt"
 
 // Error - error for Payment service specific errors
 type Error struct {
-	Code int
-	Msg  string
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
 }
 
 func (e *Error) Error() string {
@@ -50,14 +50,19 @@ var (
 	}
 )
 
-// Validation error codes
+// Validation or internal error codes
 const (
-	InvalidOffsetValueCode = 100
-	InvalidLimitValueCode  = 101
+	InternalErrorCode      = 100
+	InvalidOffsetValueCode = 101
+	InvalidLimitValueCode  = 102
 )
 
-// Validation errors
+// Validation or internal errors
 var (
+	ErrInternalError = &Error{
+		Code: InternalErrorCode,
+		Msg:  "INTERNAL_ERROR",
+	}
 	ErrInvalidOffsetValue = &Error{
 		Code: InvalidOffsetValueCode,
 		Msg:  "INVALID_OFFSET_VALUE",
