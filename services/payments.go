@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/anpryl/paymentsvc/models"
 	"github.com/anpryl/paymentsvc/repositories"
@@ -77,8 +76,6 @@ func (ps *paymentsService) tranferMoney(
 	if err != nil {
 		return uuid.Nil, err
 	}
-	fmt.Println("Result from", res.From)
-	fmt.Println("Result to", res.To)
 	err = ps.accountsRepository.UpdateAccount(ctx, tx, res.From)
 	if err != nil {
 		return uuid.Nil, err
