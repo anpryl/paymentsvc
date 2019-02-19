@@ -77,7 +77,7 @@ I was very limited in time. So I had to sacrifice some features, good practices,
 | 6 | SAME_ACCOUNT_TRANSFER | 
 | 100 | INTERNAL_ERROR |
 | 101 | INVALID_OFFSET_VALUE |
-| 102 | INVALID_OFFSET_VALUE |
+| 102 | INVALID_LIMIT_VALUE |
 
 **Content example**
 
