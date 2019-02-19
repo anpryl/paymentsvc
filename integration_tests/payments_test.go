@@ -87,3 +87,11 @@ func TestCreatePaymentAccountDidntExist(t *testing.T) {
 	a.NotNil(err)
 	a.Zero(paymentID)
 }
+
+func TestEmptyPayments(t *testing.T) {
+	a := assert.New(t)
+	var ps []models.Payment
+	_, err := httpGetJSON("/accounts/"+uuid.NewV4().String()+"/payments", &ps)
+	a.Nil(err)
+	a.Len(ps, 0)
+}
