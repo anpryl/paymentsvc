@@ -11,6 +11,7 @@ import (
 type Accounts interface {
 	ListOfAccounts(context.Context, models.OffsetLimit) ([]models.Account, error)
 	AddAccount(context.Context, NewAccount) (uuid.UUID, error)
+	AccountByID(context.Context, uuid.UUID) (*models.Account, error)
 }
 
 type Currencies interface {

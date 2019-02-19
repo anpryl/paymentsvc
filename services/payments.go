@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/anpryl/paymentsvc/models"
 	"github.com/anpryl/paymentsvc/repositories"
@@ -13,13 +14,15 @@ func NewPaymentsService(
 	pr repositories.Payments,
 	ar repositories.Accounts,
 	cr repositories.Currencies,
+	er repositories.ExchangeRates,
 	withTx repositories.WithTransactionFunc,
 ) Payments {
 	return &paymentsService{
-		paymentsRepository:   pr,
-		accountsRepository:   ar,
-		currenciesRepository: cr,
-		withTx:               withTx,
+		paymentsRepository:      pr,
+		accountsRepository:      ar,
+		currenciesRepository:    cr,
+		exchangeRatesRepository: er,
+		withTx:                  withTx,
 	}
 }
 
@@ -74,6 +77,8 @@ func (ps *paymentsService) tranferMoney(
 	if err != nil {
 		return uuid.Nil, err
 	}
+	fmt.Println("Result from", res.From)
+	fmt.Println("Result to", res.To)
 	err = ps.accountsRepository.UpdateAccount(ctx, tx, res.From)
 	if err != nil {
 		return uuid.Nil, err
@@ -97,7 +102,7 @@ func (ps *paymentsService) transferAccountInfo(
 	id uuid.UUID,
 	p NewPayment,
 ) (*transfer.AccountInfo, error) {
-	acc, err := ps.accountsRepository.AccountByID(ctx, tx, p.FromAccount)
+	acc, err := ps.accountsRepository.AccountByIDTx(ctx, tx, id)
 	if err != nil {
 		return nil, err
 	}
