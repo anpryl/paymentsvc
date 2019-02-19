@@ -23,7 +23,7 @@ type Currency struct {
 
 // ExchangeRate - information about exchange rates between two currencies
 type ExchangeRate struct {
-	ID                      uuid.UUID       `sql:"numeric_code,pk" json:"id"`
+	ID                      uuid.UUID       `sql:"id,pk,type:uuid default gen_random_uuid()" json:"id"`
 	CurrencyNumericCodeFrom int             `json:"currency_numeric_code_from"`
 	CurrencyNumericCodeTo   int             `json:"currency_numeric_code_to"`
 	Rate                    decimal.Decimal `json:"rate"`
