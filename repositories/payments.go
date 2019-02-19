@@ -12,7 +12,6 @@ import (
 )
 
 func NewPaymentsRepository(db *pg.DB) Payments {
-
 	return &paymentsRepository{db: db}
 }
 
@@ -25,7 +24,8 @@ func (n *paymentsRepository) AccountPayments(ctx context.Context, id uuid.UUID, 
 	err := n.db.WithContext(ctx).Model(&ps).
 		Offset(ol.Offset).
 		Limit(ol.Limit).
-		Where("account_from = ?", id).Select()
+		Where("from_account = ?", id).
+		Select()
 	return ps, err
 }
 
