@@ -9,7 +9,7 @@ import (
 
 // Account - information about account
 type Account struct {
-	ID                  uuid.UUID       `sql:"id,pk,type:uuid default uuid_generate_v4()" json:"id"`
+	ID                  uuid.UUID       `sql:"id,pk,type:uuid default gen_random_uuid()" json:"id"`
 	CurrencyNumericCode int             `json:"currency_numeric_code"`
 	Balance             decimal.Decimal `json:"balance"`
 }
@@ -30,7 +30,7 @@ type ExchangeRate struct {
 }
 
 type Payment struct {
-	ID                  uuid.UUID       `sql:"id,pk" json:"id"`
+	ID                  uuid.UUID       `sql:"id,pk,type:uuid default gen_random_uuid()" json:"id"`
 	FromAccount         uuid.UUID       `json:"from_account"`
 	ToAccount           uuid.UUID       `json:"to_account"`
 	CurrencyNumericCode int             `json:"currency_numeric_code"`
