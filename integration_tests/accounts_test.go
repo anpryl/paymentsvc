@@ -25,35 +25,46 @@ func TestAddAndListAccounts(t *testing.T) {
 		a.Equal(http.StatusCreated, resp.StatusCode)
 	}
 
-	var accs []models.Account
-	resp, err = httpGetJSON("/accounts", &accs)
+	var res models.Account
+	_, err = httpGetJSON("/accounts/"+idResp.ID.String(), &res)
 	a.Nil(err)
-	a.Equal(http.StatusOK, resp.StatusCode)
-	if a.Len(accs, 1) {
-		res := accs[0]
-		a.True(uuid.Equal(idResp.ID, res.ID))
-		a.Equal(acc.CurrencyNumericCode, res.CurrencyNumericCode)
-		expectedBalance := acc.Balance.RoundBank(2) // UAH Minor
-		a.True(res.Balance.Equal(expectedBalance))
-	}
+	a.NotZero(res)
+	a.True(uuid.Equal(idResp.ID, res.ID))
+	a.Equal(acc.CurrencyNumericCode, res.CurrencyNumericCode)
+	expectedBalance := acc.Balance.RoundBank(2) // UAH Minor
+	a.True(res.Balance.Equal(expectedBalance))
 }
 
 func TestAddAccountInvalidCurrency(t *testing.T) {
 	a := assert.New(t)
 	acc := services.NewAccount{
-		CurrencyNumericCode: -1000000, // UAH
+		CurrencyNumericCode: -1000000,
 		Balance:             decimal.NewFromFloat(10000.5012),
 	}
-	var beforeAccs []models.Account
-	_, err := httpGetJSON("/accounts", &beforeAccs)
-	a.Nil(err)
-
 	var idResp api.IDResp
-	_, err = httpPostJSON("/accounts", acc, &idResp)
+	_, err := httpPostJSON("/accounts", acc, &idResp)
 	a.NotNil(err)
+	a.Zero(idResp)
 
-	var accs []models.Account
-	_, err = httpGetJSON("/accounts", &accs)
-	a.Nil(err)
-	a.Equal(beforeAccs, accs)
+	var res models.Account
+	_, err = httpGetJSON("/accounts/"+idResp.ID.String(), &res)
+	a.NotNil(err)
+	a.Zero(res)
+}
+
+func TestNegativeBalance(t *testing.T) {
+	a := assert.New(t)
+	acc := services.NewAccount{
+		CurrencyNumericCode: 980, // UAH
+		Balance:             decimal.NewFromFloat(-10000),
+	}
+	var idResp api.IDResp
+	_, err := httpPostJSON("/accounts", acc, &idResp)
+	a.NotNil(err)
+	a.Zero(idResp)
+
+	var res models.Account
+	_, err = httpGetJSON("/accounts/"+idResp.ID.String(), &res)
+	a.NotNil(err)
+	a.Zero(res)
 }

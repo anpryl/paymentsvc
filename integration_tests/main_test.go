@@ -40,11 +40,11 @@ func httpPostJSON(url string, v interface{}, res interface{}) (*http.Response, e
 	if res != nil {
 		b, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return resp, err
 		}
 		if err := json.Unmarshal(b, res); err != nil {
 			fmt.Println("Err resp body:", string(b))
-			return nil, err
+			return resp, err
 		}
 		return resp, nil
 	}
@@ -60,11 +60,11 @@ func httpGetJSON(url string, res interface{}) (*http.Response, error) {
 	if res != nil {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return resp, err
 		}
 		if err := json.Unmarshal(b, res); err != nil {
 			fmt.Println("Err resp body:", string(b))
-			return nil, err
+			return resp, err
 		}
 		return resp, nil
 	}
