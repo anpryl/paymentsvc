@@ -13,7 +13,8 @@ import (
 type Accounts interface {
 	CreateAccount(context.Context, models.Account) (uuid.UUID, error)
 	ListOfAccounts(context.Context, models.OffsetLimit) ([]models.Account, error)
-	AccountByID(context.Context, Tx, uuid.UUID) (*models.Account, error)
+	AccountByID(context.Context, uuid.UUID) (*models.Account, error)
+	AccountByIDTx(context.Context, Tx, uuid.UUID) (*models.Account, error)
 	UpdateAccount(context.Context, Tx, models.Account) error
 }
 
