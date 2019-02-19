@@ -9,6 +9,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+const usdCode = 840
+
 var decimalOne = decimal.NewFromFloat(1)
 
 func NewExchangeRatesRepository(db *pg.DB) ExchangeRates {
@@ -38,21 +40,39 @@ func (e *exchangeRatesRepository) ExchangeRateForCurrencies(
 		CurrencyNumericCodeFrom: args.CurrencyNumericCodeTo,
 		CurrencyNumericCodeTo:   args.CurrencyNumericCodeFrom,
 	})
+	if err == nil {
+		return decimalOne.Div(r), nil
+	}
+	if err != svcerrors.ErrInvalidCurrencyCode {
+		return decimal.Zero, err
+	}
+	// Try to re-create rate through USD
+	usdFromRate, err := e.exchangeRateForCurrencies(ctx, models.ExchangeRateArgs{
+		CurrencyNumericCodeFrom: usdCode,
+		CurrencyNumericCodeTo:   args.CurrencyNumericCodeFrom,
+	})
 	if err != nil {
 		return decimal.Zero, err
 	}
-	return decimalOne.Div(r), nil
+	usdToRate, err := e.exchangeRateForCurrencies(ctx, models.ExchangeRateArgs{
+		CurrencyNumericCodeFrom: usdCode,
+		CurrencyNumericCodeTo:   args.CurrencyNumericCodeTo,
+	})
+	if err != nil {
+		return decimal.Zero, err
+	}
+	return usdToRate.Div(usdFromRate), nil
 }
 
 func (e *exchangeRatesRepository) exchangeRateForCurrencies(
 	ctx context.Context,
 	args models.ExchangeRateArgs,
 ) (decimal.Decimal, error) {
-	er := &models.ExchangeRate{
-		CurrencyNumericCodeFrom: args.CurrencyNumericCodeFrom,
-		CurrencyNumericCodeTo:   args.CurrencyNumericCodeTo,
-	}
-	err := e.db.WithContext(ctx).Model(&er).Select()
+	var er models.ExchangeRate
+	err := e.db.WithContext(ctx).Model(&er).
+		Where("currency_numeric_code_from = ?", args.CurrencyNumericCodeFrom).
+		Where("currency_numeric_code_to = ?", args.CurrencyNumericCodeTo).
+		Select()
 	if err == pg.ErrNoRows {
 		return decimal.Zero, svcerrors.ErrInvalidCurrencyCode
 	}
