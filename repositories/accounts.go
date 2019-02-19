@@ -29,18 +29,18 @@ func (a *accountsRepository) CreateAccount(
 	return acc.ID, err
 }
 
-func (*accountsRepository) UpdateAccount(
-	ctx context.Context,
-	tx Tx,
-	acc models.Account,
-) error {
+func (*accountsRepository) UpdateAccount(ctx context.Context, tx Tx, acc models.Account) error {
 	if acc.Balance.LessThanOrEqual(decimal.Zero) {
 		return svcerrors.ErrNegativeBalance
 	}
 	return tx.Update(&acc)
 }
 
-func (*accountsRepository) AccountByID(
+func (a *accountsRepository) AccountByID(ctx context.Context, id uuid.UUID) (*models.Account, error) {
+	return a.AccountByIDTx(ctx, a.db.WithContext(ctx), id)
+}
+
+func (*accountsRepository) AccountByIDTx(
 	ctx context.Context,
 	tx Tx,
 	id uuid.UUID,
