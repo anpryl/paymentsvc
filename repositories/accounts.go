@@ -37,7 +37,17 @@ func (*accountsRepository) UpdateAccount(ctx context.Context, tx Tx, acc models.
 }
 
 func (a *accountsRepository) AccountByID(ctx context.Context, id uuid.UUID) (*models.Account, error) {
-	return a.AccountByIDTx(ctx, a.db.WithContext(ctx), id)
+	acc := &models.Account{}
+	err := a.db.WithContext(ctx).Model(acc).
+		Where("id = ?", id).
+		Select()
+	if err == pg.ErrNoRows {
+		return nil, svcerrors.ErrInvalidAccountID
+	}
+	if err != nil {
+		return nil, err
+	}
+	return acc, nil
 }
 
 func (*accountsRepository) AccountByIDTx(
@@ -46,7 +56,12 @@ func (*accountsRepository) AccountByIDTx(
 	id uuid.UUID,
 ) (*models.Account, error) {
 	acc := &models.Account{}
-	err := tx.Model(acc).Where("id = ?", id).Select()
+	_, err := tx.QueryOne(acc, `
+	SELECT accounts.*
+	  FROM accounts
+	 WHERE accounts.id = ?
+	   FOR UPDATE
+	`, id)
 	if err == pg.ErrNoRows {
 		return nil, svcerrors.ErrInvalidAccountID
 	}
